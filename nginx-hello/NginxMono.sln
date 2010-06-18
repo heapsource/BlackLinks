@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2857B73E-F847-4B02-9238-064979017E93}") = "NginxMonoLib", "NginxMonoLib.cproj", "{39676B41-D8A6-4D04-AB52-30CDE8D4BC29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NginxMono", "NginxMono.csproj", "{37DC3911-5067-4C50-AB0B-D7F70FE375F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackLinks", "BlackLinks\BlackLinks.csproj", "{C1B82409-0C7E-4748-9510-9AC90B35184A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackLinks_UnitTests", "BlackLinks_UnitTests\BlackLinks_UnitTests.csproj", "{9C69B894-8E6C-4469-B17A-EFDC17649576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sampleApplication", "sampleApplication\sampleApplication.csproj", "{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39676B41-D8A6-4D04-AB52-30CDE8D4BC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39676B41-D8A6-4D04-AB52-30CDE8D4BC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39676B41-D8A6-4D04-AB52-30CDE8D4BC29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C69B894-8E6C-4469-B17A-EFDC17649576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C69B894-8E6C-4469-B17A-EFDC17649576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C69B894-8E6C-4469-B17A-EFDC17649576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C69B894-8E6C-4469-B17A-EFDC17649576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = BlackLinks_UnitTests\BlackLinks_UnitTests.csproj
+	EndGlobalSection
+EndGlobal

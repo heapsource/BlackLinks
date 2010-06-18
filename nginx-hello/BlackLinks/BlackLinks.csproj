@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C1B82409-0C7E-4748-9510-9AC90B35184A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>BlackLinks</RootNamespace>
+    <AssemblyName>BlackLinks</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Routing\Router.cs" />
+    <Compile Include="Routing\Route.cs" />
+    <Compile Include="Routing\RouteCollection.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="Routing\StringExtensions.cs" />
+    <Compile Include="Routing\RouteWalker.cs" />
+    <Compile Include="BlackAction.cs" />
+    <Compile Include="BlackApplication.cs" />
+    <Compile Include="ActionPhase.cs" />
+    <Compile Include="Routing\RouteEvaluation.cs" />
+    <Compile Include="ActionExecuteType.cs" />
+    <Compile Include="BlackException.cs" />
+    <Compile Include="Hosting\HostManager.cs" />
+    <Compile Include="BlackRequest.cs" />
+    <Compile Include="RequestHeader.cs" />
+    <Compile Include="BlackContext.cs" />
+    <Compile Include="Filter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Routing\" />
+    <Folder Include="Hosting\" />
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

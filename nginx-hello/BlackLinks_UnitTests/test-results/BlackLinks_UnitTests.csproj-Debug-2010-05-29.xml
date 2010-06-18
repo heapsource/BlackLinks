@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2010-05-29T22:31:43</TestDate>
+      <Status>Success</Status>
+      <TotalFailures>0</TotalFailures>
+      <TotalSuccess>3</TotalSuccess>
+      <TotalIgnored>0</TotalIgnored>
+      <Time />
+    </UnitTestResult>
+  </Results>
+  <Tests>
+    <TestRecord Name="BlackLinks_UnitTests">
+      <Results>
+        <UnitTestResult>
+          <TestDate>2010-05-29T22:31:43</TestDate>
+          <Status>Success</Status>
+          <TotalFailures>0</TotalFailures>
+          <TotalSuccess>3</TotalSuccess>
+          <TotalIgnored>0</TotalIgnored>
+          <Time />
+        </UnitTestResult>
+      </Results>
+      <Tests>
+        <TestRecord Name="RoutingTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2010-05-29T22:31:43</TestDate>
+              <Status>Success</Status>
+              <TotalFailures>0</TotalFailures>
+              <TotalSuccess>3</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="TestDynamicRoutesAndMemberRoutes">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2010-05-29T22:31:43</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.03ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError>Loading Filters
+0 declarative filters has been loaded for type BlackLinks_UnitTests.RoutingTest+TestDynamicRoutesAndMemberRoutesController+Item
+Loading Filters
+0 declarative filters has been loaded for type BlackLinks_UnitTests.RoutingTest+TestDynamicRoutesAndMemberRoutesController+Item
+Loading Filters
+0 declarative filters has been loaded for type BlackLinks_UnitTests.RoutingTest+TestDynamicRoutesAndMemberRoutesController+Item
+Loading Filters
+0 declarative filters has been loaded for type BlackLinks_UnitTests.RoutingTest+TestDynamicRoutesAndMemberRoutesController+Item
+Loading Filters
+0 declarative filters has been loaded for type BlackLinks_UnitTests.RoutingTest+TestDynamicRoutesAndMemberRoutesController+Item
+</ConsoleError>
+                </UnitTestResult>
+              </Results>
+            </TestRecord>
+            <TestRecord Name="TestNotFoundRoute">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2010-05-29T22:31:43</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+            </TestRecord>
+            <TestRecord Name="TestRootRoute">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2010-05-29T22:31:43</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+      </Tests>
+    </TestRecord>
+  </Tests>
+</TestRecord>

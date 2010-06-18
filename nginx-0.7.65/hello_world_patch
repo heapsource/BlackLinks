@@ -1,0 +1,6 @@
+objs/addon/nginx-hello/ngx_http_hello_world_module.o:	$(ADDON_DEPS) \
+	/home/chamo/nginx-hello/ngx_http_hello_world_module.c
+	$(CC) -c $(CFLAGS)  $(ALL_INCS) `pkg-config --cflags --libs mono` -I /usr/include/glib-2.0/ \
+		-o objs/addon/nginx-hello/ngx_http_hello_world_module.o \
+		/home/chamo/nginx-hello/ngx_http_hello_world_module.c
+

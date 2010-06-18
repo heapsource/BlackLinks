@@ -1,0 +1,5 @@
+Name: NginxMonoLib
+Description: 
+Version: 0.1
+Libs: -L/home/chamo/nginx-hello/bin/Debug -lNginxMonoLib
+Cflags: -I

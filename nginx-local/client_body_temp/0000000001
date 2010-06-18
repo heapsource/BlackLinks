@@ -1,0 +1,27 @@
+------WebKitFormBoundaryBczPyBwqUcpknEgb
+Content-Disposition: form-data; name="texto"
+
+este es mi valor
+------WebKitFormBoundaryBczPyBwqUcpknEgb
+Content-Disposition: form-data; name="texto2"
+
+este es mi valor para texto 2
+------WebKitFormBoundaryBczPyBwqUcpknEgb
+Content-Disposition: form-data; name="filesitoA"; filename="Archivo.txt"
+Content-Type: text/plain
+
+Este es un boundary
+Este es un encabezado 1
+este es otro encabezado 1: v=2
+
+
+Este es un boundary
+Este es un encabezado 2
+este es otro encabezado 2: v=2
+
+
+------WebKitFormBoundaryBczPyBwqUcpknEgb
+Content-Disposition: form-data; name="filesitoB"; filename=""
+
+
+------WebKitFormBoundaryBczPyBwqUcpknEgb--
