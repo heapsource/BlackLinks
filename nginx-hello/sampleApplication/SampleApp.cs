@@ -33,6 +33,26 @@ namespace sampleApplication
 				Name ="GoGet",
 				ControllerType = typeof(SearchController)
 			});
+			this.Routes.RootRoute.MemberRoutes.Add (
+				new Route { 
+				ActionName = "GetBigPage", 
+				Name = "GetBigPage", ControllerType = typeof(SearchController) });
+			
+			this.Routes.RootRoute.MemberRoutes.Add(new Route{
+				ActionName = "Index",
+				Name = "Patients",
+				ControllerType = typeof(PatientsController)
+			});
+		}
+		protected override void OnStart ()
+		{
+			base.OnStart ();
+			this.Templates.RegisterFileCompiler (".ecs", typeof(BlackLinks.Templates.CSharpTemplateCompiler));
+			var resourceCompilation = this.Templates.Compile (BlackLinks.Templates.TemplateSource.FromResource ("sampleApplication.Views.Patients.Index.ecs", "sampleApplicationViews.Patients.Index"));
+			if (!resourceCompilation.Success)
+			{
+				throw new Exception("Error Compiling the Stuff:" + resourceCompilation.CompilationErrors[0].ErrorText);
+			}
 		}
 	}
 }

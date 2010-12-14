@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 
 namespace BlackLinks
 {
-	public abstract class BlackRequest : IDisposable
+	public abstract class BlackRequest : MarshalByRefObject, IDisposable
 	{
 		public Encoding ResponseTextEncoding{get;set;}
 		public abstract string MethodName{get;}
@@ -75,9 +75,57 @@ namespace BlackLinks
 		/// </param>
 		public void Write (string text)
 		{
-			var data = ResponseTextEncoding.GetBytes(text);
-			this.ResponseBody.Write( data,0, data.Length);
-			this.ResponseBody.Flush();
+			var data = ResponseTextEncoding.GetBytes (text);
+			this.ResponseBody.Write (data, 0, data.Length);
+			this.ResponseBody.Flush ();
 		}
+		
+		private void ParseFormValuesIfAny ()
+		{
+			if (this.ContentType == "application/x-www-form-urlencoded") {
+				EnsureRequestBody ();
+				using (StreamReader reader = new StreamReader (this.RequestBody)) {
+					string encodedFormString = reader.ReadToEnd ();
+					string[] formPairs = encodedFormString.Split ('&');
+					foreach (string pair in formPairs) {
+						var equalCharIndex = pair.IndexOf ('=');
+						var name = pair.Substring (0, equalCharIndex);
+						var val = System.Web.HttpUtility.UrlDecode (pair.Substring (equalCharIndex + 1));
+						//Console.Error.WriteLine ("Form Key={0},Value={1}", name, val);
+						this.FormValues.Add (name, val);
+					}
+				}
+			}
+		}
+		
+		private void ParseArgumentsIfAny ()
+		{
+			if (!string.IsNullOrEmpty (this.QueryString)) {
+				string[] argsPairs = this.QueryString.Split ('&');
+				foreach (string pair in argsPairs) {
+					var equalCharIndex = pair.IndexOf ('=');
+					if (equalCharIndex == -1) {
+						//if there is no value pair, the key is the value and the value is an empty string.
+						this.Arguments.Add (pair, string.Empty);
+						continue;
+					}
+					//Console.Error.WriteLine ("equalCharIndex={0}", equalCharIndex);
+					var name = pair.Substring (0, equalCharIndex);
+					var val = System.Web.HttpUtility.UrlDecode (pair.Substring (equalCharIndex + 1));
+					//Console.Error.WriteLine ("Arg Key={0},Value={1}", name, val);
+					this.Arguments.Add (name, val);
+				}
+			}
+		}
+		
+		protected void Initialize ()
+		{
+			this.ParseFormValuesIfAny ();
+			this.ParseArgumentsIfAny ();
+		}
+		
+		protected abstract void EnsureRequestBody ();
+		
+		public abstract string QueryString { get; }
 	}
 }

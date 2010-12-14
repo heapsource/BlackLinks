@@ -36,6 +36,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

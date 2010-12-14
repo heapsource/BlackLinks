@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using BlackLinks.Routing;
+using BlackLinks.Templates;
+using System.Threading;
 
 namespace BlackLinks
 {
@@ -8,35 +10,63 @@ namespace BlackLinks
 	{
 		public BlackApplication ()
 		{
-			this.Routes = new BlackLinks.Routing.Router(this);
+			this.Routes = new BlackLinks.Routing.Router (this);
+			this.Templates = new TemplatesManager ();
 		}
 		public Routing.Router Routes{get;private set;}
 		
 		
-		public BlackAction ActivateActionCore(Type controllerType,string actionName)
+		public BlackAction ActivateActionCore (Type controllerType, string actionName)
 		{
-			if(controllerType == null)
-				throw new ArgumentNullException("controllerType");
-			if(actionName == null)
-				throw new ArgumentNullException("actionName");
-			var controllerInstance = (Controller)Activator.CreateInstance(controllerType);
+			if (controllerType == null)
+				throw new ArgumentNullException ("controllerType");
+			if (actionName == null)
+				throw new ArgumentNullException ("actionName");
+			var controllerInstance = (Controller)Activator.CreateInstance (controllerType);
 			
-			var actionType = (from nt in controllerType.GetNestedTypes() where nt.Name == actionName select nt).FirstOrDefault();
-			if(actionType == null)
-				throw new BlackException(string.Format("No type for action '{0}' was found in controller '{1}'",actionName,controllerType.AssemblyQualifiedName),null);
+			var actionType = (from nt in controllerType.GetNestedTypes ()
+				where nt.Name == actionName
+				select nt).FirstOrDefault ();
+			if (actionType == null)
+				throw new BlackException (string.Format ("No type for action '{0}' was found in controller '{1}'", actionName, controllerType.AssemblyQualifiedName), null);
 			
-			var actionInstance = (BlackAction)Activator.CreateInstance(actionType);
-			controllerInstance.own(actionInstance);
-			actionInstance.loadFilters();
+			var actionInstance = (BlackAction)Activator.CreateInstance (actionType);
+			controllerInstance.own (actionInstance);
+			actionInstance.loadFilters ();
 			return actionInstance;
 		}
-		internal void EnsureControllerType(Type controllerType)
+		
+		internal void EnsureControllerType (Type controllerType)
 		{
-			
+		
+		}
+		public TemplatesManager Templates {get;private set;}
+		bool Initialized;
+		static readonly object StartLock = new object();
+		
+		protected virtual void OnStart ()
+		{
+		
 		}
 		
-		internal void ProcessRequest(BlackRequest request)
+		void initialize ()
 		{
+			this.OnStart ();
+			Initialized = true;
+		}
+		
+		void ensureInitialized ()
+		{
+			lock (StartLock) {
+				if (!Initialized) {
+					this.initialize();
+				}
+			}
+		}
+		
+		internal void ProcessRequest (BlackRequest request)
+		{
+			ensureInitialized();
 			BlackContext context = new BlackContext(this,request.Uri);
 			context.Request = request;
 			

@@ -9,25 +9,22 @@ public class NginxBlackHostManager : HostManager
 	{
 
 	}
+	
+	public const int NGX_OK = 0;
 
-	public int Process(IntPtr nginx_request)
+	public int Process (IntPtr nginx_request)
 	{
-		Console.Error.WriteLine("NginxBlackHostManager Is processing request at domain = {0} ",AppDomain.CurrentDomain.FriendlyName);
-		var info = MainApp.GetNginxMonoRequestInfo(nginx_request);
-		Console.Error.WriteLine("Headers Count = {0} ",info.headers_count);
-		NginxMonoHeader[] xheaders = null; //;new NginxMonoHeader[info.headers_count];
-		MainApp.GetNginxHeaders(nginx_request,out xheaders,info.headers_count);
+		Console.Error.WriteLine ("NginxBlackHostManager Is processing request at domain = {0} ", AppDomain.CurrentDomain.FriendlyName);
 		
-		NginxMonoHeader[] headers = new NginxMonoHeader[info.headers_count];
-		for(int i = 0;i < info.headers_count;i++)
-		{
-			headers[i] = xheaders[i];	
-		}
 		
-		var request = new NginxBlackRequest(nginx_request,info,headers);
+		var request = NginxBlackRequest.RequestFromNginxRequest (nginx_request);
 		
-		this.ProcessRequest(request);
-		MainApp.NginxWriteResponse(nginx_request,request.ResponseBodyMemory.ToArray(),request.ResponseContentType,request.ResponseStatusCode);
-		return 0;
+		this.ProcessRequest (request);
+		MainApp.NginxWriteResponse (nginx_request, request.ResponseBodyMemory.ToArray (), request.ResponseContentType, request.ResponseStatusCode);
+		return NGX_OK;
+	}
+	protected override void OnInitialize ()
+	{
+		
 	}
 }

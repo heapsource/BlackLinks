@@ -31,12 +31,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="MongoDB.Bson, Version=0.9.0.3992, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=0.9.0.3992, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>MongoDB.Driver.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SampleApp.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="LandingController.cs" />
     <Compile Include="SearchController.cs" />
+    <Compile Include="PatientsController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlackLinks\BlackLinks.csproj">
@@ -45,4 +54,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Views\" />
+    <Folder Include="Views\Patients\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Patients\Index.ecs" />
+  </ItemGroup>
 </Project>

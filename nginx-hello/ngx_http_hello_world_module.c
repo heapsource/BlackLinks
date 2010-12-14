@@ -1,12 +1,20 @@
-#include <ngx_config.h>
+#include <ngx_config.h>    
 #include <ngx_core.h>
-#include <ngx_http.h>
- 
-#include <glib.h>
+#include <ngx_http.h> 
+  
+#include <glib.h> 
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
+#include <mono/metadata/threads.h>
+  
+typedef struct {
+    ngx_str_t blacklinks_app_dir; 
+
+} ngx_http_blacklinks_loc_conf_t;
+
+ngx_http_blacklinks_loc_conf_t * global_blacklinks_conf;
 
 extern void
 mono_security_enable_core_clr ();
@@ -14,18 +22,20 @@ mono_security_enable_core_clr ();
 extern void
 mono_security_set_core_clr_platform_callback (MonoCoreClrPlatformCB callback);
 
-void ensure_mono(ngx_http_request_t *r);
-static char *ngx_http_hello_world(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+void ensure_mono(ngx_log_t  *log);
+MonoString* GetConfigurationAppPathDirectory();
+static char *ngx_http_blacklinks_application_configuration(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+void *
+ngx_blacklinks_create_loc_conf(ngx_conf_t *cf);
 
 static ngx_command_t  ngx_http_hello_world_commands[] = {
 
-  { ngx_string("hello_world"),
-    NGX_HTTP_LOC_CONF|NGX_CONF_NOARGS,
-    ngx_http_hello_world,
-    0,
+  { ngx_string("blacklinks_application"),
+    NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+    ngx_http_blacklinks_application_configuration,
+    NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
-
     ngx_null_command
 }; 
 
@@ -62,7 +72,7 @@ static ngx_http_module_t  ngx_http_hello_world_module_ctx = {
   NULL,                          /* create server configuration */
   NULL,                          /* merge server configuration */
 
-  NULL,                          /* create location configuration */
+  ngx_blacklinks_create_loc_conf,                          /* create location configuration */
   NULL                           /* merge location configuration */
 };
 
@@ -87,6 +97,9 @@ ngx_module_t ngx_http_hello_world_module = {
 	MonoObject *my_class_instance;
 MonoMethodDesc* process_method_desc;
 MonoMethod* process_method;
+
+MonoMethodDesc *ensure_init_app_method_desc;
+MonoMethod *ensure_init_app_method;
 
 //MonoClass * mono_header_class;
 //MonoProperty * mono_header_key_prop;
@@ -210,9 +223,9 @@ static void GetNginxHeaders (ngx_http_request_t * r, NginxMonoHeader ** passedmh
 	ngx_table_elt_t              *header;
 	ngx_uint_t                    i,key;
 	//size_t                        len;
-	
+	 
 	MonoDomain * current_domain = mono_domain_get();
-		//MonoArray * array;
+		//MonoArray * array;   
 	*passedmheaders = ((NginxMonoHeader*) g_malloc(sizeof(NginxMonoHeader) * 
 	(count  * 2)
 ));
@@ -315,15 +328,16 @@ determinate_if_platform_assembly_callback (const char *image_name)
 	return TRUE;
 }
 #endif
-void ensure_mono(ngx_http_request_t *r)
-{
-	if(domain) return;
+void ensure_mono(ngx_log_t  *log)
+{   
+	ngx_log_error(NGX_LOG_ERR, log, 0, "Ensuring Mono");    
+	if(domain) return;  
 	#if X_SECURE
 	mono_security_set_core_clr_platform_callback(determinate_if_platform_assembly_callback);
 	mono_security_enable_core_clr ();
-	#endif
-	
-	domain = mono_jit_init ("/home/chamo/nginx-hello/main.dll");
+	#endif         
+	ngx_log_error(NGX_LOG_ERR, log, 0, "Initializing Mono Domain");
+	domain = mono_jit_init_version ("MonoNginxDomain","v2.0.50727");
 	mono_config_parse (NULL);
 	mono_add_internal_call ("MainApp::NginxWriteResponse", NginxWriteResponse);
 	mono_add_internal_call ("MainApp::GetNginxMonoRequestInfo", GetNginxMonoRequestInfo);
@@ -332,21 +346,21 @@ void ensure_mono(ngx_http_request_t *r)
 	mono_add_internal_call ("MainApp::ReadClientBody", ReadClientBody);
 	mono_add_internal_call ("MainApp::GetRequestBodyFileName", GetRequestBodyFileName);
 	mono_add_internal_call ("MainApp::SecureEnvironment", SecureEnvironment);
-
-mono_add_internal_call ("MainApp::WriteNginxLog", WriteNginxLog);
+	mono_add_internal_call ("MainApp::GetConfigurationAppPathDirectory", GetConfigurationAppPathDirectory);
+	mono_add_internal_call ("MainApp::WriteNginxLog", WriteNginxLog);
 
 	if(domain)
 	{
-		ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Domain Intialized");
+		ngx_log_error(NGX_LOG_ERR, log, 0, "Domain Intialized");
 	}else{
-		ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Domain can not be initialized");
+		ngx_log_error(NGX_LOG_ERR, log, 0, "Domain can not be initialized");
 	}
  
-	assembly = mono_domain_assembly_open (domain, "/home/chamo/nginx-hello/main.dll");
+	assembly = mono_domain_assembly_open (domain, "/home/thepumpkin/BlackLinks/nginx-local/sbin/NginxBlackLinks.dll");
 if(assembly)
-{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Assembly Loaded");
+{	ngx_log_error(NGX_LOG_ERR, log, 0, "Assembly Loaded");
 }else
-{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Assembly  Could not be Loaded");
+{	ngx_log_error(NGX_LOG_ERR, log, 0, "Assembly  Could not be Loaded");
 }
 	if (assembly)
 	{
@@ -357,62 +371,120 @@ if(assembly)
 		//mono_header_value_prop = mono_class_get_property_from_name(mono_header_class,"Value");
 
 		if(myclass)
-		{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Class Loaded");
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "Class Loaded");
 		}else{
-			ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Class could not be Loaded");
+			ngx_log_error(NGX_LOG_ERR, log, 0, "Class could not be Loaded");
 		}
   		my_class_instance = mono_object_new (domain, myclass);
 		if(my_class_instance)
-		{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Class Instantiated");
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "Class Instantiated");
 		}else{
-			ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Class could not been instantiated");
+			ngx_log_error(NGX_LOG_ERR, log, 0, "Class could not been instantiated");
 		}
   		mono_runtime_object_init (my_class_instance);
 
 		process_method_desc = mono_method_desc_new("MainApp:Process(intptr)", TRUE);
 		if(process_method_desc)
-		{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Process Method Desc Found");
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "Process Method Desc Found");
 		}else{
-			ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Process Method Desc NOT Found");
+			ngx_log_error(NGX_LOG_ERR, log, 0, "Process Method Desc NOT Found");
 		}
 
 		process_method = mono_method_desc_search_in_class(process_method_desc,myclass);
 		if(process_method)
-		{	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Process Method Found");
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "Process Method Found");
 		}else{
-			ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Process Method NOT Found");
+			ngx_log_error(NGX_LOG_ERR, log, 0, "Process Method NOT Found");
 		}
-
+		
+		ensure_init_app_method_desc = mono_method_desc_new("MainApp:EnsureInitializeApp()", TRUE);
+		if(ensure_init_app_method_desc)
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "EnsureInitApp Method Desc Found");
+		}else{
+			ngx_log_error(NGX_LOG_ERR, log, 0, "EnsureInitApp Method Desc NOT Found");
+		}
+		ensure_init_app_method = mono_method_desc_search_in_class(ensure_init_app_method_desc,myclass);
+		if(ensure_init_app_method)
+		{	ngx_log_error(NGX_LOG_ERR, log, 0, "EnsureInitApp Method Found");
+		}else{
+			ngx_log_error(NGX_LOG_ERR, log, 0, "EnsureInitApp Method NOT Found");
+		}
+		mono_thread_attach(domain);
+		 mono_runtime_invoke (ensure_init_app_method, my_class_instance, NULL, NULL);
 	}
 }
- 
+
 static ngx_int_t ngx_http_hello_world_handler(ngx_http_request_t *r)
 {
+	
+	ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_http_hello_world_handler");
+	//ngx_http_hello_world_loc_conf_t  *plcf;
+	ngx_http_blacklinks_loc_conf_t *blcf;
+	blcf = ngx_http_get_module_loc_conf(r, ngx_http_hello_world_module);
 	//ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Hello World Handler Requested");
-	ensure_mono(r); 
-
-  	void *args [1];
+	ensure_mono(r->connection->log); 
+	
+	//
+	MonoThread * callt = mono_thread_attach(domain);
+	  	void *args [1];
   	args [0] = &r; 
 //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, ".NET Method Invoking");
   MonoObject * returnValueMono = mono_runtime_invoke (process_method, my_class_instance, args, NULL);
 //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, ".NET Method Invoked");
 
-  return *(int*)mono_object_unbox (returnValueMono);
- 
+	ngx_int_t res = *(int*)mono_object_unbox (returnValueMono);
+	mono_thread_detach(callt);
+  return res;
+  
+//return NGX_OK;
 }
 
-static char *ngx_http_hello_world(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+void *
+ngx_blacklinks_create_loc_conf(ngx_conf_t *cf)
 {
-  ngx_http_core_loc_conf_t  *clcf;
+    ngx_http_blacklinks_loc_conf_t  *conf;
+    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_blacklinks_loc_conf_t));
+    if (conf == NULL) {
+	    ngx_log_error(NGX_LOG_ERR, cf->log, 0, "We had an error initializing the configuration structure");
+        return NULL;
+    }
+    ngx_log_error(NGX_LOG_ERR, cf->log, 0, "Configuration Structure Successfuly initializede");
+    return conf;
+}
 
+static char *ngx_http_blacklinks_application_configuration(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+	
+  ngx_http_core_loc_conf_t  *clcf;
   clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
   clcf->handler = ngx_http_hello_world_handler;
-
+  
+  ngx_http_blacklinks_loc_conf_t * bc = conf;
+  if(!bc)
+  {
+	  ngx_log_error(NGX_LOG_ERR, cf->log, 0, "Invalid configuration structure");
+	  return NGX_CONF_ERROR;
+}
+   
+  if(cf->args->nelts > 0)
+  {
+  ngx_str_t                         *value = cf->args->elts;
+  bc->blacklinks_app_dir.data = value[1].data;
+  bc->blacklinks_app_dir.len = value[1].len;
+  ngx_log_error(NGX_LOG_ERR, cf->log, 0, (const char *)bc->blacklinks_app_dir.data);
+  }
+  global_blacklinks_conf = bc;
+  
+  // Now that we have the configuration, Initialize the app inmediately.
+  //ensure_mono(cf);  
   return NGX_CONF_OK;
 }
 
-
 void SecureEnvironment()
 {
-	
+	 
+}
+
+MonoString* GetConfigurationAppPathDirectory() {
+	return mono_string_new_len (domain, (const char *)global_blacklinks_conf->blacklinks_app_dir.data,global_blacklinks_conf->blacklinks_app_dir.len);
 }

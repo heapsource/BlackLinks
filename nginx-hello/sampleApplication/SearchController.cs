@@ -1,5 +1,6 @@
 using System;
 using BlackLinks;
+using System.Collections.Generic;
 
 namespace sampleApplication
 {
@@ -30,6 +31,18 @@ namespace sampleApplication
 				foreach(string k in this.Context.Request.Arguments.Keys)
 				{
 					this.Context.Request.Write(string.Format("<p>{0}={1}</p>",k,this.Context.Request.Arguments[k]));
+				}
+			}
+		}
+		public class GetBigPage : BlackAction
+		{
+			public override void OnExecute ()
+			{
+				this.Context.Request.ResponseContentType = "text/html";
+				this.Context.Request.Write ("<h1>Title Number XXX</h1>");
+				for(int i = 0;i < 1000;i++) {
+					string s = string.Format ("<p>This is the title of the shit{0}</p>",i);
+					this.Context.Request.Write (s);
 				}
 			}
 		}

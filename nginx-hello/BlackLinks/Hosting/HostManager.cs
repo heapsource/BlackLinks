@@ -24,31 +24,44 @@ namespace BlackLinks.Hosting
 		/// <returns>
 		/// A <see cref="T"/>
 		/// </returns>
-		public static T LoadApplication<T>(string blackApplicationDirectory) where T:HostManager, new()
+		public static T LoadApplication<T> (string blackApplicationDirectory) where T : HostManager, new()
 		{
+			
+			Console.Error.WriteLine ("Initializing HostManger<{0}> at '{1}' with base directory '{2}'", typeof(T).AssemblyQualifiedName, blackApplicationDirectory, AppDomain.CurrentDomain.BaseDirectory);
 			var type = typeof(T);
-			AppDomainSetup setup = new AppDomainSetup();
+			AppDomainSetup setup = new AppDomainSetup ();
 			setup.ApplicationBase = blackApplicationDirectory;
-			setup.ConfigurationFile = Path.Combine(blackApplicationDirectory,"app.config");
-			AppDomain appDomain = AppDomain.CreateDomain("BlackApplicationDomain",null,setup);
-			var hostManager = (T)appDomain.CreateInstanceAndUnwrap(type.Assembly.FullName,type.FullName);
+			setup.ConfigurationFile = Path.Combine (blackApplicationDirectory, "app.config");
+			AppDomain appDomain = AppDomain.CreateDomain ("BlackApplicationDomain", null, setup);
+			var hostManager = (T)appDomain.CreateInstanceAndUnwrap (type.Assembly.FullName, type.FullName);
 			hostManager.HostDomain = appDomain;
-			hostManager.Initialize();
+			hostManager.BaseDirectory = blackApplicationDirectory;
+			hostManager.Initialize ();
+			Console.Error.WriteLine ("Initialized App");
+			
 			return hostManager;
 		}
+		
+		public string BaseDirectory {get;private set;}
 		
 		protected void ProcessRequest(BlackRequest request)
 		{
 			Console.Error.WriteLine("AppDomain {0} received request to {1}",AppDomain.CurrentDomain.FriendlyName,request.Uri);
 			this.ApplicationInstance.ProcessRequest(request);	
 		}
-		internal void Initialize()
+		internal void Initialize ()
 		{
 			//Load the Application Instance using Config Files.
 			var appType = ConfigurationManager.AppSettings["ApplicationTypePath"];
-			var type = Type.GetType(appType);
-			ApplicationInstance = (BlackApplication)type.Assembly.CreateInstance(type.FullName);
+			if (string.IsNullOrEmpty (appType))
+			{
+				throw new HostManagerException (string.Format ("The target application does not have 'ApplicationTypePath' configuration key. App Domain base directory is '{0}'", AppDomain.CurrentDomain.BaseDirectory));
+			}
+			var type = Type.GetType (appType);
+			ApplicationInstance = (BlackApplication)type.Assembly.CreateInstance (type.FullName);
+			this.OnInitialize();
 		}
+		protected abstract void OnInitialize();
 		public void Unload()
 		{
 			if(HostDomain != null)

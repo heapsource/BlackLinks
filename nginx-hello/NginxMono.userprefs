@@ -1,25 +1,33 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="BlackLinks.DevHost/Main.cs" ctype="Workbench">
+    <Files>
+      <File FileName="NginxBlackHostManager.cs" Line="7" Column="2" />
+      <File FileName="main.cs" Line="161" Column="3" />
+      <File FileName="BlackLinks/Hosting/HostManager.cs" Line="29" Column="4" />
+      <File FileName="BlackLinks.DevHost/Main.cs" Line="16" Column="5" />
+      <File FileName="BlackLinks/Hosting/DevelopmentHostManager.cs" Line="10" Column="60" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="BlackLinks" expanded="True">
             <Node name="Hosting" expanded="True" />
           </Node>
-          <Node name="NginxMono" expanded="True">
+          <Node name="BlackLinks.DevHost" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
+          </Node>
+          <Node name="NginxMono">
             <Option id="ShowVersionControlOverlays" value="True" />
             <Option id="ShowAllFiles" value="True" />
           </Node>
-          <Node name="NginxMonoLib" expanded="True">
+          <Node name="NginxMonoLib">
             <Option id="ShowVersionControlOverlays" value="True" />
             <Option id="ShowAllFiles" value="True" />
-            <Node name="ngx_http_hello_world_module.c" selected="True" />
           </Node>
-          <Node name="sampleApplication" expanded="True">
+          <Node name="sampleApplication">
             <Option id="ShowVersionControlOverlays" value="True" />
             <Option id="ShowAllFiles" value="True" />
-            <Node name="bin" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -38,4 +46,8 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
 </Properties>

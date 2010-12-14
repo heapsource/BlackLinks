@@ -3,6 +3,7 @@ using System;
 
 namespace BlackLinks
 {
+	[Serializable]
 	public class RequestHeader
 	{
 		public RequestHeader()

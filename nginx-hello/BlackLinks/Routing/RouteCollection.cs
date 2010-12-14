@@ -17,7 +17,7 @@ namespace BlackLinks.Routing
 		{
 			this.parent = parent;
 		}
-		public void Add (Route item)
+		public new void Add (Route item)
 		{
 			if(this.parent != null)
 				this.parent.own(item);

@@ -10,7 +10,7 @@ namespace BlackLinks
 			
 		}
 		
-		internal void own(BlackAction action)
+		internal void own (BlackAction action)
 		{
 			action.ControllerInstance = this;
 		}

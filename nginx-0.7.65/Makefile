@@ -11,25 +11,25 @@ install:
 	$(MAKE) -f objs/Makefile install
 
 upgrade:
-	/home/chamo/nginx-local/sbin/nginx -t
+	../nginx-local/sbin/nginx -t
 
-	kill -USR2 `cat /home/chamo/nginx-local/logs/nginx.pid`
+	kill -USR2 `cat ../nginx-local/logs/nginx.pid`
 	sleep 1
-	test -f /home/chamo/nginx-local/logs/nginx.pid.oldbin
+	test -f ../nginx-local/logs/nginx.pid.oldbin
 
-	kill -QUIT `cat /home/chamo/nginx-local/logs/nginx.pid.oldbin`
+	kill -QUIT `cat ../nginx-local/logs/nginx.pid.oldbin`
 
 upgrade1:
 	# upgrade 0.1.x to 0.2+
 
-	/home/chamo/nginx-local/sbin/nginx -t
+	../nginx-local/sbin/nginx -t
 
-	cp /home/chamo/nginx-local/logs/nginx.pid /home/chamo/nginx-local/logs/nginx.pid.oldbin
+	cp ../nginx-local/logs/nginx.pid ../nginx-local/logs/nginx.pid.oldbin
 
-	kill -USR2 `cat /home/chamo/nginx-local/logs/nginx.pid`
+	kill -USR2 `cat ../nginx-local/logs/nginx.pid`
 	sleep 1
-	test -f /home/chamo/nginx-local/logs/nginx.pid.oldbin
+	test -f ../nginx-local/logs/nginx.pid.oldbin
 
-	cp /home/chamo/nginx-local/logs/nginx.pid /home/chamo/nginx-local/logs/nginx.pid.newbin
+	cp ../nginx-local/logs/nginx.pid ../nginx-local/logs/nginx.pid.newbin
 
-	kill -QUIT `cat /home/chamo/nginx-local/logs/nginx.pid.oldbin`
+	kill -QUIT `cat ../nginx-local/logs/nginx.pid.oldbin`

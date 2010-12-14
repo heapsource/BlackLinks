@@ -11,12 +11,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackLinks_UnitTests", "Bla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sampleApplication", "sampleApplication\sampleApplication.csproj", "{BEEAD250-D121-43A5-AEF4-D38B2757FF4B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27CE4804-91A7-470F-8CDC-2840B543B52F}"
+	ProjectSection(SolutionItems) = preProject
+		ngx_http_hello_world_module.c = ngx_http_hello_world_module.c
+		..\nginx-local\conf\nginx.conf = ..\nginx-local\conf\nginx.conf
+		..\nginx-0.7.65\recompile.sh = ..\nginx-0.7.65\recompile.sh
+		config = config
+		..\nginx-0.7.65\objs\Makefile = ..\nginx-0.7.65\objs\Makefile
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackLinks.DevHost", "BlackLinks.DevHost\BlackLinks.DevHost.csproj", "{00D13133-6127-43AD-B902-27DB38EBB3EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00D13133-6127-43AD-B902-27DB38EBB3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D13133-6127-43AD-B902-27DB38EBB3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D13133-6127-43AD-B902-27DB38EBB3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D13133-6127-43AD-B902-27DB38EBB3EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37DC3911-5067-4C50-AB0B-D7F70FE375F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,7 +52,9 @@ Global
 		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1B82409-0C7E-4748-9510-9AC90B35184A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = BlackLinks_UnitTests\BlackLinks_UnitTests.csproj
+		StartupItem = BlackLinks.DevHost\BlackLinks.DevHost.csproj
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace BlackLinks
 {
@@ -77,6 +78,8 @@ namespace BlackLinks
 		/// </returns>
 		internal bool Execute(ActionExecuteType type)
 		{
+			this.Writer = new StreamWriter(this.Context.Request.ResponseBody);
+			
 			bool result = false;
 			if(this.NextPhase == ActionPhase.Filters)
 			{
@@ -146,6 +149,15 @@ namespace BlackLinks
 		}
 		
 		public Controller ControllerInstance{get;internal set;}
-		public BlackContext Context{get;internal set;}
+		public BlackContext Context { get; internal set; }
+		
+		public void RenderHtmlView (string viewName)
+		{
+			this.Context.Request.ResponseContentType = "text/html";
+			var template = this.Context.ApplicationInstance.Templates.DiscoverInstance(viewName);
+			template.Render(this.Writer);
+			this.Writer.Flush();
+		}
+		public TextWriter Writer{get;private set;}
 	}
 }

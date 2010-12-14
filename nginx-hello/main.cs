@@ -10,6 +10,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using BlackLinks;
+using BlackLinks.Hosting;
+using Mono.Remoting.Channels.Unix;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Reflection;
+
+[assembly: AssemblyVersion("1.0.0.0")]
 
 public class NginxRequest : IDisposable
 {
@@ -73,6 +82,7 @@ public class NginxRequest : IDisposable
 				}).ToArray();
 	
 			}*/
+			//MainApp.ngx_http_upstream_init(this.nginx_request);
 			if(finishedReading != null) finishedReading();
 		})));
 	}
@@ -167,34 +177,35 @@ public class MainApp
 	readonly object AppLoadingLock  = new object();
 	NginxBlackHostManager AppInstance = null;
 	FileSystemWatcher[] watchers = null;
-	void reloadApp()
+	void reloadApp ()
 	{
-		Console.Error.WriteLine("Nginx Mono Host is Loading the Application");
-		lock(AppLoadingLock)
+		Console.Error.WriteLine ("Nginx Mono Host is Loading the Application");
+		lock (AppLoadingLock)
 		{
-			if(watchers != null)
+			if (watchers != null)
 			{
-				foreach(var watcher in watchers)
+				foreach (var watcher in watchers)
 				{
 					watcher.EnableRaisingEvents = false;
-					watcher.Dispose();
+					watcher.Dispose ();
 				}
 			}
-			if(AppInstance != null)
+			if (AppInstance != null)
 			{
 				try
 				{
-					Console.Error.WriteLine("Nginx Mono Host is Unloading existing HostManager");
-					AppInstance.Unload();
+					Console.Error.WriteLine ("Nginx Mono Host is Unloading existing HostManager");
+					AppInstance.Unload ();
 				}
-				finally{
+				finally {
 					AppInstance = null;
 				}
 			}
 			try
 			{
-				Console.Error.WriteLine("Nginx Mono Host is Loading new HostManager");
-				AppInstance = NginxBlackHostManager.LoadApplication<NginxBlackHostManager>(appFolder);
+				string appDir = appFolder;
+				Console.Error.WriteLine ("Nginx Mono Host running at '{0}' is Loading new HostManager for directory '{1}'",Environment.CurrentDirectory,appDir);
+				AppInstance = NginxBlackHostManager.LoadApplication<NginxBlackHostManager>(appDir);
 			}finally
 			{
 				initWatchers();
@@ -238,9 +249,61 @@ public class MainApp
 		watcher.EnableRaisingEvents = true;
 			return watcher;
 		}
-	string appFolder = "/home/chamo/nginx-hello/sampleApplication/bin/Debug";
+	string appFolder {
+		get
+		{
+			return MainApp.GetConfigurationAppPathDirectory ();
+		}
+	}
+	public bool DevMode 
+	{
+		get
+		{
+			return true;
+		}
+	}
+	
+	public void EnsureInitializeApp ()
+	{
+		Console.Error.WriteLine("Ensure Initialize App");
+		if(requestsGateway == null)
+		{
+		string unixChannelPipePath = Path.GetFullPath (Path.Combine (appFolder, RequestsGateway.ApplicationHostManagerDescriptorFileName));
+		if(File.Exists(unixChannelPipePath))
+		{
+			File.Delete(unixChannelPipePath);
+		}
+		UnixChannel devChannel = new UnixChannel (unixChannelPipePath);
+		ChannelServices.RegisterChannel (devChannel, false);
+		requestsGateway = new NginxRequestsGateway (this.appFolder);
+		string objName = RequestsGateway.ApplicationHostManagerDescriptorObjectName;
+		requestsGatewayRef = RemotingServices.Marshal (requestsGateway, objName);
+		Console.Error.WriteLine ("Requests Gateway ({0}) Exposed at {1}",objName, unixChannelPipePath);
+		}
+	}
+	
+	ObjRef requestsGatewayRef;
+	NginxRequestsGateway requestsGateway;
+	
 	public unsafe int Process(IntPtr nginx_request)
 	{  
+		Console.Error.WriteLine("Unix User={0}, Group={1}",Mono.Unix.Native.Syscall.getuid(),Mono.Unix.Native.Syscall.getgid());
+		if(DevMode)
+		{
+
+			Console.Error.WriteLine("Receiving Request in Development Mode");
+			
+			//string serverUrl = DevelopmentServer.GetApplicationUnixChannelAbsoluteUri(this.appFolder);
+			//Console.Error.WriteLine("Connecting to {0}",serverUrl);
+			//devHost = (DevelopmentServer)Activator.GetObject (typeof(DevelopmentServer), serverUrl);
+		
+			Console.Error.WriteLine("Passing Nginx Request Thru NginxRequestGateway");
+			requestsGateway.Process(nginx_request.ToInt64());
+			
+			return NginxBlackHostManager.NGX_OK;
+		}
+		else
+		{
 		lock(AppLoadingLock)
 		{
 			if(AppInstance == null)
@@ -249,6 +312,7 @@ public class MainApp
 			}
 		}
 		return AppInstance.Process(nginx_request);
+		}
 		/*
 #if DEBUG
 		global_nginx_request = nginx_request;
@@ -367,4 +431,131 @@ public class MainApp
 	[MethodImplAttribute(MethodImplOptions.InternalCall)]
 	internal extern static void SecureEnvironment ();
 	
+	/*[DllImport ("__Internal")]
+	[MethodImplAttribute(MethodImplOptions.InternalCall)]
+	internal extern static void ngx_http_upstream_init (IntPtr nginx_request);*/
+	
+	[DllImport ("__Internal")]
+	[MethodImplAttribute(MethodImplOptions.InternalCall)]
+	internal extern static String GetConfigurationAppPathDirectory ();
+	
+	internal static RequestHeader[] GetRequestHeaders (IntPtr nginx_request)
+	{
+		var info = MainApp.GetNginxMonoRequestInfo (nginx_request);
+		Console.Error.WriteLine ("Headers Count = {0} ", info.headers_count);
+		NginxMonoHeader[] xheaders = null;
+		MainApp.GetNginxHeaders (nginx_request, out xheaders, info.headers_count);
+		
+		NginxMonoHeader[] headers = new NginxMonoHeader[info.headers_count];
+		for (int i = 0; i < info.headers_count; i++) {
+			headers[i] = xheaders[i];
+		}
+		return (from h in headers
+			select new RequestHeader { Key = h.Key, Value = h.Value }).ToArray ();
+	}
+	internal static void WriteNginxDiagnosticPageFooter(StringBuilder pageBuffer)
+	{
+		pageBuffer.AppendFormat("<p style=\"color:gray\">BlackLinks Framework {0} / Nginx</p>",typeof(MainApp).Assembly.GetName().Version.ToString());
+	}
+}
+static class NginxPointerExtension
+{
+	public static IntPtr ToPointer(this long p)
+	{
+		return new IntPtr(p);
+	}
+}
+class NginxRequestsGateway : RequestsGateway
+{
+	string appDirectory;
+	public NginxRequestsGateway (string appDirectory)
+	{
+		this.appDirectory = appDirectory;
+		/*
+		 * UnixChannel c = new UnixChannel ();
+		 * ChannelServices.RegisterChannel(c,false);
+		*/
+	}
+	public override RequestHeader[] GetHeaders (long nginx_request)
+	{
+		return MainApp.GetRequestHeaders (nginx_request.ToPointer());
+	}
+	public override string GetMethodName (long requestId)
+	{
+		return MainApp.GetNginxMonoRequestInfo (requestId.ToPointer()).method_name;
+	}
+	public override string GetHttpProtocol (long requestId)
+	{
+		return MainApp.GetNginxMonoRequestInfo (requestId.ToPointer()).http_protocol;
+	}
+	public override string GetQueryString (long requestId)
+	{
+		return MainApp.GetNginxMonoRequestInfo (requestId.ToPointer()).args;
+	}
+	public override string GetUri (long requestId)
+	{
+		return MainApp.GetNginxMonoRequestInfo (requestId.ToPointer()).uri;
+	}
+	public override byte[] GetRequestContent (long requestId)
+	{
+		ManualResetEvent ev = new ManualResetEvent (false);
+		byte[] data = null;
+		MainApp.ReadClientBody (requestId.ToPointer(), Marshal.GetFunctionPointerForDelegate (new MainApp.ReadClientBodyCallback (r =>
+		{
+			string file = MainApp.GetRequestBodyFileName (requestId.ToPointer());
+			using (var requestBody = File.OpenRead (file))
+			{
+				data = new byte[requestBody.Length];
+				requestBody.Read (data, 0, data.Length);
+			}
+			ev.Set ();
+		})));
+		ev.WaitOne ();
+		return data;
+	}
+	public override void AddResponseHeader (long requestId, RequestHeader header)
+	{
+		MainApp.AddResponseHeader (requestId.ToPointer (), header.Key, header.Value);
+	}
+	public override void WriteResponse (long requestId, byte[] bytes, string contentType, int statusCode)
+	{
+		MainApp.NginxWriteResponse(requestId.ToPointer(),bytes,contentType,statusCode);
+	}
+	public override void Process (long nginx_request)
+	{
+		string receiverPath = RequestsGateway.GetReceiverUnixChannelAbsoluteUri (this.appDirectory);
+		Console.Error.WriteLine ("Getting Receiver from {0}", receiverPath);
+		try 
+		{
+			this.Receiver = (IRequestReceiver)Activator.GetObject (typeof(IRequestReceiver), receiverPath);
+			if (this.Receiver != null)
+			{
+				this.Receiver.Ping ();
+			}
+		} catch (System.Runtime.Remoting.RemotingException ex)
+		{
+			Console.Error.WriteLine ("Error connecting to {0}:", receiverPath, ex.Message);
+			this.Receiver = null;
+		}
+		if (this.Receiver == null)
+		{
+			Console.Error.WriteLine ("Could not any listener at {0}", receiverPath);
+		}
+		else 
+		{
+			Console.Error.WriteLine ("Receiver Found!");
+		}
+		base.Process (nginx_request);
+	}
+	protected override void RenderReceiverNotFoundPage (long requestId)
+	{
+		StringBuilder sb = new StringBuilder ();
+		sb.AppendLine("<html><head><title>BlackLinks Gateway Error</title></head>");
+		sb.AppendLine("<body>");
+		sb.AppendLine("<h1 style=\"color:red;\">Gateway Error</h1>");
+		sb.AppendFormat("<p>Application Directory: {0}</p>",this.appDirectory);
+		MainApp.WriteNginxDiagnosticPageFooter(sb);
+		sb.AppendLine("</body></html>");
+		this.WriteResponse(requestId,System.Text.ASCIIEncoding.ASCII.GetBytes(sb.ToString()),"text/html",500);
+	}
 }

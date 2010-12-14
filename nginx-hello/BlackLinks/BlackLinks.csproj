@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
+    <Reference Include="Mono.Posix" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -54,11 +55,27 @@
     <Compile Include="RequestHeader.cs" />
     <Compile Include="BlackContext.cs" />
     <Compile Include="Filter.cs" />
+    <Compile Include="Hosting\HostManagerException.cs" />
+    <Compile Include="Hosting\GatewayHostManager.cs" />
+    <Compile Include="Hosting\RequestsGateway.cs" />
+    <Compile Include="Hosting\IRequestReceiver.cs" />
+    <Compile Include="Templates\CSharpTemplateCompiler.cs" />
+    <Compile Include="Templates\ITemplateInstanceDiscoveryProvider.cs" />
+    <Compile Include="Templates\TemplateCompiler.cs" />
+    <Compile Include="Templates\TemplatesManager.cs" />
+    <Compile Include="Templates\TemplateCompilerNotFoundException.cs" />
+    <Compile Include="Templates\TemplateInstanceDiscoveryProviderAttribute.cs" />
+    <Compile Include="Templates\TemplateRenderResource.cs" />
+    <Compile Include="Templates\TemplatesCompilationParameters.cs" />
+    <Compile Include="Templates\TemplatesCompilationResult.cs" />
+    <Compile Include="Templates\TemplateSource.cs" />
+    <Compile Include="Templates\TemplateSourceException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Routing\" />
     <Folder Include="Hosting\" />
     <Folder Include="Configuration\" />
+    <Folder Include="Templates\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
