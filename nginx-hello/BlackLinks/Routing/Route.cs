@@ -92,13 +92,17 @@ namespace BlackLinks.Routing
 		Router router;
 		public Router Router
 		{
-			get{return router;}
+			get { return router; }
 			internal set
 			{
 				this.router = value;
-				if(this.router != null)
-					this.router.ApplicationInstance.EnsureControllerType(this.ControllerType);
+				if (this.router != null)
+					this.router.ApplicationInstance.EnsureControllerType (this.ControllerType);
 			}
+		}
+		public override string ToString ()
+		{
+			return string.Format ("[Route: Name={0}, ActionName={1}]", Name, ActionName);
 		}
 	}
 }

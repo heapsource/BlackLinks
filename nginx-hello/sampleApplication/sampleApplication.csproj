@@ -45,7 +45,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="LandingController.cs" />
     <Compile Include="SearchController.cs" />
-    <Compile Include="PatientsController.cs" />
+    <Compile Include="Controllers\Patients.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlackLinks\BlackLinks.csproj">
@@ -57,8 +57,11 @@
   <ItemGroup>
     <Folder Include="Views\" />
     <Folder Include="Views\Patients\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\Patients\Index.ecs" />
+    <EmbeddedResource Include="Views\Patients\Index.html.ecs" />
+    <EmbeddedResource Include="Views\Patients\New.html.ecs" />
+    <EmbeddedResource Include="Views\Patients\Show.html.ecs" />
   </ItemGroup>
 </Project>

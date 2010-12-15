@@ -1,21 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="BlackLinks.DevHost/Main.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="sampleApplication/PatientsController.cs" ctype="Workbench">
     <Files>
-      <File FileName="NginxBlackHostManager.cs" Line="7" Column="2" />
-      <File FileName="main.cs" Line="161" Column="3" />
-      <File FileName="BlackLinks/Hosting/HostManager.cs" Line="29" Column="4" />
-      <File FileName="BlackLinks.DevHost/Main.cs" Line="16" Column="5" />
-      <File FileName="BlackLinks/Hosting/DevelopmentHostManager.cs" Line="10" Column="60" />
+      <File FileName="sampleApplication/SampleApp.cs" Line="46" Column="4" />
+      <File FileName="sampleApplication/PatientsController.cs" Line="13" Column="5" />
+      <File FileName="sampleApplication/Views/Patients/Index.Error.NotFound.html.ecs" Line="3" Column="8" />
+      <File FileName="BlackLinks/BlackAction.cs" Line="156" Column="25" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="BlackLinks" expanded="True">
-            <Node name="Hosting" expanded="True" />
-          </Node>
-          <Node name="BlackLinks.DevHost" expanded="True" selected="True">
-            <Node name="References" expanded="True" />
+            <Node name="References" expanded="True" selected="True" />
           </Node>
           <Node name="NginxMono">
             <Option id="ShowVersionControlOverlays" value="True" />
@@ -25,9 +21,12 @@
             <Option id="ShowVersionControlOverlays" value="True" />
             <Option id="ShowAllFiles" value="True" />
           </Node>
-          <Node name="sampleApplication">
+          <Node name="sampleApplication" expanded="True">
             <Option id="ShowVersionControlOverlays" value="True" />
             <Option id="ShowAllFiles" value="True" />
+            <Node name="Views" expanded="True">
+              <Node name="Patients" expanded="True" />
+            </Node>
           </Node>
         </State>
       </Pad>

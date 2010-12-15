@@ -6,10 +6,10 @@ namespace BlackLinks
 {
 	public abstract class BlackAction
 	{
-		public Routing.Route Route{get;internal set;}
-		public BlackAction()
+		public Routing.Route Route { get; internal set; }
+		public BlackAction ()
 		{
-			this.Filters = new Collection<Filter>();
+			this.Filters = new Collection<Filter> ();
 		}
 		public Collection<Filter> Filters{get;private set;}
 		protected virtual void OnLoadFilters()
@@ -78,8 +78,10 @@ namespace BlackLinks
 		/// </returns>
 		internal bool Execute(ActionExecuteType type)
 		{
-			this.Writer = new StreamWriter(this.Context.Request.ResponseBody);
-			
+			if(this.Context != null && this.Context.Request != null)
+			{
+				this.Writer = new StreamWriter(this.Context.Request.ResponseBody);
+			}
 			bool result = false;
 			if(this.NextPhase == ActionPhase.Filters)
 			{
@@ -92,8 +94,10 @@ namespace BlackLinks
 					this.NextPhase  = ActionPhase.Execute;
 						
 				}
+				if (!result)
+					return result;
 			}
-			if(!result)return result;
+			
 			/*
 				if(this.NextPhase == ActionPhase.Authenticate)
 				{
@@ -150,11 +154,31 @@ namespace BlackLinks
 		
 		public Controller ControllerInstance{get;internal set;}
 		public BlackContext Context { get; internal set; }
-		
-		public void RenderHtmlView (string viewName)
+
+		public void RenderView (string viewName)
 		{
-			this.Context.Request.ResponseContentType = "text/html";
-			var template = this.Context.ApplicationInstance.Templates.DiscoverInstance(viewName);
+			string viewsPath = this.ControllerInstance.GetType ().FullName.Replace ("Controllers", "Views");
+			string viewPath = string.Format ("{0}.{1}", viewsPath,viewName);
+			RenderTemplate(viewPath);
+		}
+		
+		public void RenderTemplate (string templateDiscoveryPath)
+		{
+			if (templateDiscoveryPath == null)
+			{
+				throw new ArgumentNullException("viewName");
+			}
+			var template = this.Context.ApplicationInstance.Templates.DiscoverInstance (templateDiscoveryPath);
+			if (template == null) {
+				throw new TemplateNotFoundException (string.Format ("View '{0}' was not found", templateDiscoveryPath));
+			}
+			var mimeFormat = this.Context.ApplicationInstance.MimeForEntityName (templateDiscoveryPath);
+			if (mimeFormat == null)
+			{
+				throw new NotSupportedException (string.Format ("No suitable MimeType was found for view {0}",templateDiscoveryPath));
+			}
+			this.Context.Request.ResponseContentType = mimeFormat;
+
 			template.Render(this.Writer);
 			this.Writer.Flush();
 		}

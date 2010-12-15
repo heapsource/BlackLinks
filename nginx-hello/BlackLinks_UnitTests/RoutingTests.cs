@@ -67,6 +67,17 @@ namespace BlackLinks_UnitTests
 			}
 		}
 		
+		class SubRouteController : Controller
+		{
+			public class Item : BlackAction
+			{
+				public override void OnExecute ()
+				{
+					
+				}
+			}
+		}
+		
 		[Test]
 		public void TestDynamicRoutesAndMemberRoutes()
 		{
@@ -92,6 +103,13 @@ namespace BlackLinks_UnitTests
 				ActionName = "Custom",
 				Name="custom"
 			});
+			custom.DynamicRoute = new Route()
+			{
+				ActionName ="Item",
+				Name = "id",
+				ControllerType = typeof(SubRouteController)
+			};
+			
 			
 			Assert.AreEqual(router.RootRoute,router.Evaluate("/").Route,"Route / should be found for /");
 			Assert.AreEqual(item,router.Evaluate("/23").Route,"Route Controller.Item should be found for /23");
@@ -99,6 +117,7 @@ namespace BlackLinks_UnitTests
 			Assert.AreEqual(custom,router.Evaluate("/23/custom").Route,"Route Controller.Custom should be found for /23/custom");
 			Assert.AreEqual(custom,router.Evaluate("/23/custom/").Route,"Route Controller.Custom should be found for /23/custom/");
 			Assert.AreEqual(custom,router.Evaluate("/23/Custom").Route,"Route Controller.Custom should be found for /23/Custom (routing is case insensitive)");
+			Assert.AreEqual(custom.DynamicRoute,router.Evaluate("/23/custom/23").Route,"Route Controller.Custom.DinamicRoute should be found for /23/custom/23");
 		}
 	}
 }

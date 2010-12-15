@@ -82,6 +82,7 @@ namespace BlackLinks.Routing
 			while(MoveNextPart())
 			{
 				var part = CurrentPart;
+				
 				if(part.IsSlash()) //the only slash we ever found is the root.
 				{
 					this.LastEvaluatedRoute = this.router.RootRoute;
@@ -95,22 +96,23 @@ namespace BlackLinks.Routing
 				}
 				else //is not root, then we either dynamic... shit or sub...shit :)
 				{
+					Route memberRoute = null;
 					if(this.LastEvaluatedRoute.MemberRoutes.Count != 0)
 					{
-						var route = (from r in this.LastEvaluatedRoute.MemberRoutes where string.Compare(r.Name,part,true) == 0 select r).FirstOrDefault();
-						if(route != null)
+						memberRoute = (from r in this.LastEvaluatedRoute.MemberRoutes where string.Compare(r.Name,part,true) == 0 select r).FirstOrDefault();
+						if(memberRoute != null)
 						{
-							this.LastEvaluatedRoute = route;
+							this.LastEvaluatedRoute = memberRoute;
 							if(this.IsLastPart)
 							{
 								return new RouteEvaluation
 								{
-									Route = route
+									Route = this.LastEvaluatedRoute
 								};
 							}
 						}
 					}
-					if(this.LastEvaluatedRoute.DynamicRoute != null)
+					if(memberRoute == null && this.LastEvaluatedRoute.DynamicRoute != null)
 					{
 						var action = this.Context.ActivateAction(this.LastEvaluatedRoute.DynamicRoute);
 						if(action.Execute(ActionExecuteType.Filters))

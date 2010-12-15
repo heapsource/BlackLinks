@@ -124,25 +124,43 @@ namespace BlackLinks
 		/// <param name="route">
 		/// A <see cref="Routing.Route"/>
 		/// </param>
-		void executeErrorAction(Routing.Route route,BlackContext context)
+		void executeErrorAction (Routing.Route route, BlackContext context)
 		{
 			Route currentRoute = route;
-		up_route:
+			up_route:
 			Route errorRoute = currentRoute.ErrorRoute;
-			if(errorRoute == null && currentRoute.Parent != null)
+			if (errorRoute == null && currentRoute.Parent != null)
 			{
 				currentRoute = currentRoute.Parent;
 				goto up_route;
 			}
-			if(errorRoute == null)
+			if (errorRoute == null)
 			{
-				context.writeDefaultErrorPage();
+				context.writeDefaultErrorPage ();
 			}
 			else
 			{
-				var errorAction = context.ActivateAction(errorRoute);
-				errorAction.Execute(ActionExecuteType.Complete);
+				var errorAction = context.ActivateAction (errorRoute);
+				errorAction.Execute (ActionExecuteType.Complete);
 			}
+		}
+		
+		/// <summary>
+		/// Translate an Extension into a HTTP Mime Type.
+		/// </summary>
+		/// <param name="extension">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.String"/>
+		/// </returns>
+		public string MimeForEntityName(string entityName)
+		{
+			if(entityName.EndsWith(".html", StringComparison.InvariantCultureIgnoreCase))
+				return "text/html";
+			if (entityName.EndsWith (".text", StringComparison.InvariantCultureIgnoreCase))
+				return "text/plain";
+			return null;	
 		}
 	}
 }

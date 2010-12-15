@@ -131,9 +131,33 @@ namespace BlackLinks.Templates
 			foreach (var provider in this.instanceProviders)
 			{
 				TemplateRenderResource resource = provider.DiscoverInstance (path);
-				if(resource != null) return resource;
+				if (resource != null)
+					return resource;
 			}
 			return null;
+		}
+		
+		public bool SupportsExtension (string extension)
+		{
+			if (extension == null)
+				throw new ArgumentNullException ("extension");
+			return this.fileCompilers.ContainsKey(normalizeFileExtension(extension));
+		}
+		
+		public TemplatesCompilationResult AddEmbeddedTemplates (Assembly assembly)
+		{
+			if (assembly == null)
+				throw new ArgumentNullException ("assembly");
+			
+			List<TemplateSource> sources = new List<TemplateSource> ();
+			foreach (var resourceName in assembly.GetManifestResourceNames ())
+			{
+				FileInfo fileInfo = new FileInfo (resourceName);
+				
+				TemplateSource source = TemplateSource.FromResource (assembly, resourceName, fileInfo.Name.Replace (fileInfo.Extension, string.Empty));
+				sources.Add (source);
+			}
+			return this.Compile(sources.ToArray());
 		}
 	}
 }

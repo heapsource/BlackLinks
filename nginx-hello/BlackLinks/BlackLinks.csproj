@@ -35,6 +35,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="Mono.Addins, Version=0.4.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Package>mono-addins</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -70,6 +73,9 @@
     <Compile Include="Templates\TemplatesCompilationResult.cs" />
     <Compile Include="Templates\TemplateSource.cs" />
     <Compile Include="Templates\TemplateSourceException.cs" />
+    <Compile Include="Templates\TemplateNotFoundException.cs" />
+    <Compile Include="ControllerAttribute.cs" />
+    <Compile Include="ActionAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Routing\" />

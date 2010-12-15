@@ -3,10 +3,12 @@ using BlackLinks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace sampleApplication
+namespace sampleApplication.Controllers
 {
-	public class PatientsController : Controller
+	[Controller(Route="/Patients")]
+	public class Patients : Controller
 	{
+		[Action]
 		public class Index : BlackAction 
 		{
 			public override void OnExecute ()
@@ -19,8 +21,22 @@ namespace sampleApplication
 				MongoDatabase test = server.GetDatabase ("test");
 				test.GetCollection("Patients").Save(new BsonDocument(new BsonElement("Name",BsonValue.Create("Johan Hernandnez"))));
 				this.Context.Request.Write ("<p>Inserted</p>");
-				*/
-				this.RenderHtmlView("sampleApplicationViews.Patients.Index");
+				*/			
+				this.RenderView ("Index.html");
+			}
+		}
+		public class New : BlackAction
+		{
+			public override void OnExecute ()
+			{
+				this.RenderView ("New.html");
+			}
+		}
+		public class Show : BlackAction
+		{
+			public override void OnExecute ()
+			{
+				this.RenderView ("Show.html");
 			}
 		}
 	}
