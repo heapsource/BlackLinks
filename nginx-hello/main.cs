@@ -259,7 +259,7 @@ public class MainApp
 	{
 		get
 		{
-			return false;
+			return MainApp.GetConfigurationIsGatewayMode();
 		}
 	}
 	
@@ -438,6 +438,12 @@ public class MainApp
 	[DllImport ("__Internal")]
 	[MethodImplAttribute(MethodImplOptions.InternalCall)]
 	internal extern static String GetConfigurationAppPathDirectory ();
+	
+	[DllImport ("__Internal")]
+	[MethodImplAttribute(MethodImplOptions.InternalCall)]
+	internal extern static bool GetConfigurationIsGatewayMode ();
+	
+	
 	
 	internal static RequestHeader[] GetRequestHeaders (IntPtr nginx_request)
 	{

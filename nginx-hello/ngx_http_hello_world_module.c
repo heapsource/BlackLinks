@@ -11,7 +11,7 @@
   
 typedef struct {
     ngx_str_t blacklinks_app_dir; 
-
+	ngx_flag_t   	gateway_mode;
 } ngx_http_blacklinks_loc_conf_t;
 
 ngx_http_blacklinks_loc_conf_t * global_blacklinks_conf;
@@ -24,6 +24,7 @@ mono_security_set_core_clr_platform_callback (MonoCoreClrPlatformCB callback);
 
 void ensure_mono(ngx_log_t  *log);
 MonoString* GetConfigurationAppPathDirectory();
+MonoBoolean* GetConfigurationIsGatewayMode();
 static char *ngx_http_blacklinks_application_configuration(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 void *
 ngx_blacklinks_create_loc_conf(ngx_conf_t *cf);
@@ -36,6 +37,12 @@ static ngx_command_t  ngx_http_hello_world_commands[] = {
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
+    { ngx_string("gateway_mode"),
+     	NGX_HTTP_LOC_CONF | NGX_CONF_FLAG,
+      ngx_conf_set_flag_slot,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      offsetof(ngx_http_blacklinks_loc_conf_t, gateway_mode),
+      NULL },
     ngx_null_command
 }; 
 
@@ -348,6 +355,7 @@ void ensure_mono(ngx_log_t  *log)
 	mono_add_internal_call ("MainApp::SecureEnvironment", SecureEnvironment);
 	mono_add_internal_call ("MainApp::GetConfigurationAppPathDirectory", GetConfigurationAppPathDirectory);
 	mono_add_internal_call ("MainApp::WriteNginxLog", WriteNginxLog);
+	mono_add_internal_call ("MainApp::GetConfigurationIsGatewayMode", GetConfigurationIsGatewayMode);
 
 	if(domain)
 	{
@@ -448,6 +456,7 @@ ngx_blacklinks_create_loc_conf(ngx_conf_t *cf)
 	    ngx_log_error(NGX_LOG_ERR, cf->log, 0, "We had an error initializing the configuration structure");
         return NULL;
     }
+    conf->gateway_mode = NGX_CONF_UNSET;
     ngx_log_error(NGX_LOG_ERR, cf->log, 0, "Configuration Structure Successfuly initializede");
     return conf;
 }
@@ -487,4 +496,8 @@ void SecureEnvironment()
 
 MonoString* GetConfigurationAppPathDirectory() {
 	return mono_string_new_len (domain, (const char *)global_blacklinks_conf->blacklinks_app_dir.data,global_blacklinks_conf->blacklinks_app_dir.len);
+}
+
+MonoBoolean* GetConfigurationIsGatewayMode() {
+	return (MonoBoolean*)global_blacklinks_conf->gateway_mode;
 }
