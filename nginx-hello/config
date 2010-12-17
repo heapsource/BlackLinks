@@ -13,6 +13,7 @@ ngx_feature_path="/usr/include/mono-1.0"
 
 if [ $ngx_found = yes ]; then
 	MONO_HEADERS="/usr/include/mono-1.0/ /usr/include/glib-2.0/ /usr/lib/glib-2.0/include"
+	MONO_LIBS="`pkg-config --libs mono` `pkg-config --libs glib-2.0`"
 	echo "Mono 2.6 Found: OK"
 else
 	ngx_feature="black_links on Debian 2.8"
@@ -32,6 +33,7 @@ else
     	MONO_HEADERS="/usr/include/mono-2.0/ /usr/include/glib-2.0/ /usr/lib/glib-2.0/include"
     	echo "Mono 2.8 Found: OK"
     fi
+    MONO_LIBS="-pthread -lmono -ldl -lm -lrt"
 fi
 if [ $ngx_found = no ]; then
  cat << END
@@ -40,6 +42,5 @@ END
  exit 1
 fi
 
-MONO_LIBS="`pkg-config --libs mono` `pkg-config --libs glib-2.0`"
 CORE_INCS="$CORE_INCS $MONO_HEADERS"
 CORE_LIBS="$CORE_LIBS $MONO_LIBS"
