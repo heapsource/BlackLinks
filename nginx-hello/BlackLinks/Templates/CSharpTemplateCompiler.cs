@@ -1,4 +1,4 @@
-
+#undef DEBUG
 using System;
 using System.IO;
 using System.Text;
@@ -66,14 +66,15 @@ namespace BlackLinks.Templates
 			{
 				result.Assemblies.Add(results.CompiledAssembly);
 			}
+			#if DEBUG
 			foreach (CompilerError error in results.Errors) {
-#if DEBUG
-				Console.WriteLine ("\t{0} at file {1}#{2}", error.ErrorText, error.FileName, error.Line);
-#endif
+
+				Console.Error.WriteLine ("\t{0} at file {1}#{2}", error.ErrorText, error.FileName, error.Line);
+
 				
 				result.CompilationErrors.Add(error);
 			}
-			
+			#endif
 			return result;
 		}
 		
